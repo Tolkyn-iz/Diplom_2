@@ -1,32 +1,24 @@
 import allure
 import requests
-import json
+from data import ENDPOINTS
 
 
-@allure.feature("Получение ингредиентов")
+@allure.feature("Ингредиенты")
 class TestGetIngredients:
-    
+
     @allure.title("Получить список всех ингредиентов")
     def test_get_all_ingredients(self):
-        url = "https://stellarburgers.education-services.ru/api/ingredients"
-        response = requests.get(url)
-        
-        print(f"\nStatus: {response.status_code}")
-        
+        response = requests.get(ENDPOINTS["get_ingredients"])
         assert response.status_code == 200
-        
-        data = response.json()
-        print(f"\nSuccess: {data['success']}")
-        
-        if data['success']:
-            ingredients = data['data']
-            print(f"\n=== Available Ingredients ({len(ingredients)} total) ===")
-            print("\nINGREDIENTS_IDS = [")
-            for ingredient in ingredients:
-                print(f'    "{ingredient["_id"]}",  # {ingredient["name"]}')
-            print("]")
-            
-            # Сохраняем в файл для использования
-            with open('ingredients_ids.txt', 'w') as f:
-                for ingredient in ingredients:
-                    f.write(f"{ingredient['_id']} - {ingredient['name']}\n")
+        assert response.json()["success"] is True
+        assert "data" in response.json()
+        assert len(response.json()["data"]) > 0
+
+    @allure.title("Проверка структуры ингредиентов")
+    def test_ingredients_structure(self):
+        response = requests.get(ENDPOINTS["get_ingredients"])
+        ingredient = response.json()["data"][0]
+        assert "_id" in ingredient
+        assert "name" in ingredient
+        assert "type" in ingredient
+        assert "price" in ingredient

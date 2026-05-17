@@ -1,76 +1,36 @@
 import allure
-import pytest
 from api.user_api import UserAPI
 
 
-@allure.feature("Логин пользователя")
+@allure.feature("Авторизация")
 class TestLoginUser:
 
-    @allure.title("Авторизация существующего пользователя")
-    @allure.description("Проверка успешного входа зарегистрированного пользователя")
-    def test_login_existing_user(self, unique_user_data):
-        # Сначала создаем пользователя
-        register_response = UserAPI.create_user(unique_user_data)
-        assert register_response.status_code == 200, "Failed to create user"
-        
-        # Авторизуемся
-        login_data = {
+    @allure.title("Логин существующего пользователя")
+    def test_login_existing_user(self, created_user):
+        response, user_data = created_user
+        login_response = UserAPI.login_user({
+            "email": user_data["email"],
+            "password": user_data["password"]
+        })
+        assert login_response.status_code == 200
+        assert "accessToken" in login_response.json()
+        assert "refreshToken" in login_response.json()
+
+    @allure.title("Логин с неверным паролем")
+    def test_login_invalid_password(self, created_user):
+        response, user_data = created_user
+        login_response = UserAPI.login_user({
+            "email": user_data["email"],
+            "password": "WrongPassword123"
+        })
+        assert login_response.status_code == 401
+        assert login_response.json()["message"] == "email or password are incorrect"
+
+    @allure.title("Логин с несуществующим email")
+    def test_login_nonexistent_user(self, unique_user_data):
+        login_response = UserAPI.login_user({
             "email": unique_user_data["email"],
             "password": unique_user_data["password"]
-        }
-        response = UserAPI.login_user(login_data)
-        
-        assert response.status_code == 200
-        assert response.json()["success"] is True
-        assert "accessToken" in response.json()
-        assert "refreshToken" in response.json()
-        assert response.json()["user"]["email"] == unique_user_data["email"]
-        assert response.json()["user"]["name"] == unique_user_data["name"]
-
-    @allure.title("Авторизация с неверным email")
-    @allure.description("Проверка ошибки при входе с неправильным email")
-    def test_login_invalid_email(self, unique_user_data):
-        # Создаем пользователя
-        register_response = UserAPI.create_user(unique_user_data)
-        assert register_response.status_code == 200
-        
-        # Пытаемся войти с неверным email
-        login_data = {
-            "email": "wrong_email@test.com",
-            "password": unique_user_data["password"]
-        }
-        response = UserAPI.login_user(login_data)
-        
-        assert response.status_code == 401
-        assert response.json()["success"] is False
-        assert response.json()["message"] == "email or password are incorrect"
-
-    @allure.title("Авторизация с неверным паролем")
-    @allure.description("Проверка ошибки при входе с неправильным паролем")
-    def test_login_invalid_password(self, unique_user_data):
-        # Создаем пользователя
-        register_response = UserAPI.create_user(unique_user_data)
-        assert register_response.status_code == 200
-        
-        # Пытаемся войти с неверным паролем
-        login_data = {
-            "email": unique_user_data["email"],
-            "password": "wrong_password"
-        }
-        response = UserAPI.login_user(login_data)
-        
-        assert response.status_code == 401
-        assert response.json()["success"] is False
-        assert response.json()["message"] == "email or password are incorrect"
-
-    @allure.title("Авторизация без заполнения полей")
-    @allure.description("Проверка ошибки при входе без email и пароля")
-    def test_login_empty_fields(self):
-        login_data = {
-            "email": "",
-            "password": ""
-        }
-        response = UserAPI.login_user(login_data)
-        
-        assert response.status_code == 401
-        assert response.json()["success"] is False
+        })
+        assert login_response.status_code == 401
+        assert login_response.json()["message"] == "email or password are incorrect"

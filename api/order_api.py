@@ -1,27 +1,20 @@
-import requests
 import allure
+import requests
+from data import ENDPOINTS
 
 
 class OrderAPI:
-    BASE_URL = "https://stellarburgers.education-services.ru/api"
 
     @staticmethod
-    @allure.step("Отправить запрос на создание заказа")
-    def create_order(order_data, access_token=None):
-        """Создание заказа"""
-        url = f"{OrderAPI.BASE_URL}/orders"
+    @allure.step("Создать заказ")
+    def create_order(ingredients, access_token=None):
         headers = {}
         if access_token:
             headers["Authorization"] = access_token
-
-        response = requests.post(url, json=order_data, headers=headers)
-        return response
+        return requests.post(ENDPOINTS["create_order"], json=ingredients, headers=headers)
 
     @staticmethod
-    @allure.step("Получить список заказов пользователя")
+    @allure.step("Получить заказы пользователя")
     def get_user_orders(access_token):
-        """Получение заказов пользователя"""
-        url = f"{OrderAPI.BASE_URL}/orders"
         headers = {"Authorization": access_token}
-        response = requests.get(url, headers=headers)
-        return response
+        return requests.get(ENDPOINTS["get_orders"], headers=headers)
