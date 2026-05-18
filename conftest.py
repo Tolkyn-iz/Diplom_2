@@ -1,6 +1,7 @@
 import pytest
 from helpers import get_ingredient_ids
 from api.user_api import UserAPI
+from data import INVALID_INGREDIENT_HASH, EMPTY_INGREDIENTS
 
 
 @pytest.fixture
@@ -12,14 +13,14 @@ def valid_ingredients():
 
 @pytest.fixture
 def empty_ingredients():
-    """Пустой список ингредиентов"""
-    return {"ingredients": []}
+    """Пустой список ингредиентов (из data)"""
+    return EMPTY_INGREDIENTS
 
 
 @pytest.fixture
 def invalid_ingredient_hash():
-    """Невалидный хеш ингредиента"""
-    return {"ingredients": ["invalid_hash_123"]}
+    """Невалидный хеш ингредиента (из data)"""
+    return INVALID_INGREDIENT_HASH
 
 
 @pytest.fixture
@@ -35,20 +36,20 @@ def unique_user_data():
 
 @pytest.fixture
 def created_user(unique_user_data):
-    """Создаёт пользователя и удаляет после теста"""
+    """Создаёт пользователя и удаляет после теста (без assert)"""
     response = UserAPI.create_user(unique_user_data)
-    assert response.status_code == 200
     access_token = response.json().get("accessToken")
     
+    # Возвращаем данные, а не делаем assert
     yield response, unique_user_data
     
-    # Удаляем пользователя после теста
+    # Очистка после теста (даже если тест упал)
     if access_token:
         UserAPI.delete_user(access_token)
 
 
 @pytest.fixture
 def auth_token(created_user):
-    """Возвращает токен авторизации созданного пользователя"""
+    """Возвращает токен авторизации (без assert)"""
     response, _ = created_user
     return response.json().get("accessToken")

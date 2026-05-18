@@ -15,7 +15,7 @@ class TestCreateUser:
         assert response.json()["user"]["email"] == unique_user_data["email"]
         assert response.json()["user"]["name"] == unique_user_data["name"]
         
-        # Очистка
+        # Очистка (прямо в тесте, т.к. нет фикстуры для этого теста)
         access_token = response.json().get("accessToken")
         UserAPI.delete_user(access_token)
 
@@ -25,6 +25,7 @@ class TestCreateUser:
         second_response = UserAPI.create_user(user_data)
         assert second_response.status_code == 403
         assert second_response.json()["message"] == "User already exists"
+        # Очистка в фикстуре created_user
 
     @allure.title("Создание пользователя без обязательного поля")
     @pytest.mark.parametrize("missing_field", ["email", "password", "name"])
@@ -34,3 +35,4 @@ class TestCreateUser:
         response = UserAPI.create_user(invalid_data)
         assert response.status_code == 403
         assert "required" in response.json()["message"].lower()
+        # Пользователь не создался, очистка не нужна

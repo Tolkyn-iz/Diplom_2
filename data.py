@@ -1,3 +1,4 @@
+# data.py
 BASE_URL = "https://stellarburgers.education-services.ru/api"
 
 ENDPOINTS = {
@@ -11,3 +12,7 @@ ENDPOINTS = {
     "get_orders": f"{BASE_URL}/orders",
     "get_ingredients": f"{BASE_URL}/ingredients",
 }
+
+# Статичные тестовые данные
+INVALID_INGREDIENT_HASH = {"ingredients": ["invalid_hash_123"]}
+EMPTY_INGREDIENTS = {"ingredients": []}
