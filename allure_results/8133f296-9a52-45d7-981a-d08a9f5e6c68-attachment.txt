@@ -1,0 +1,2 @@
+Response status: 200
+Response body: {'success': True, 'user': {'email': 'test_b3ec8888@example.com', 'name': 'User_b3ec8888'}, 'accessToken': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDhkZjZlOTg0MjcwMDAxYmU5NGQ1MSIsImlhdCI6MTc3ODk2NjM4MiwiZXhwIjoxNzc4OTY3NTgyfQ.5mhor9PMken1MyKn9bGVo14yP5oP1VQ-6dHHdz52FS0', 'refreshToken': '084ad514f1d44c6d4e27b21df0752e740484ce9fe8467be8c07791962331e6bf8d06b8f5f93161a2'}
